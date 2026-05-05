@@ -14,3 +14,12 @@
   margin-top: 0;
   margin-bottom: 16px;
 }
+
+.ligne-bus-active {
+  border-left: 4px solid #e67e22;
+  background-color: #fef9f3;
+}
+
+.ligne-bus-active .ligne-numero {
+  background-color: #e67e22;
+}
