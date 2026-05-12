@@ -38,3 +38,20 @@
   }
 }
 
+.aucun-resultat {
+  text-align: center;
+  color: #7f8c8d;
+  font-size: 1rem;
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 2px dashed #dcdde1;
+}
+
+.compteur-recherche {
+  font-size: 0.85rem;
+  color: #0a6e31;
+  margin-bottom: 12px;
+  font-style: italic;
+}
