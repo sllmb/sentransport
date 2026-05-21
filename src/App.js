@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; 
 import './App.css';
 import Header from './Header';
 import Recherche from './Recherche';
@@ -9,106 +9,34 @@ import Footer from './Footer';
 import StatReseau from './StatReseau';
 
 function App() {
+  // --- Les 3 nouveaux états pour l'API ---
+  const [lignes, setLignes] = useState([]);
+  const [chargement, setChargement] = useState(true);
+  const [erreur, setErreur] = useState(null);
+
+  // --- Vos états existants (inchangés) ---
   const [recherche, setRecherche] = useState("");
   const [ligneSelectionnee, setLigneSelectionnee] = useState(null);
   const [nbRecherches, setNbRecherches] = useState(0);
 
-  const lignes = [
-    {
-    id: 1,
-    numero: "1",
-    depart: "Parcelles Assainies",
-    arrivee: "Plateau",
-    arrets: 14,
-    listeArrets: [
-      "Parcelles U14",
-      "Parcelles U10",
-      "Camberene",
-      "Patte d'Oie",
-      "Grand Dakar",
-      "Colobane",
-      "Ponty",
-      "Plateau"
-    ]
-  },
-  {
-    id: 2,
-    numero: "7",
-    depart: "Guediawaye",
-    arrivee: "Place Obe",
-    arrets: 18,
-    listeArrets: [
-      "Guediawaye",
-      "Pikine",
-      "Thiaroye",
-      "Keur Massar",
-      "Grand Yoff",
-      "Parcelles",
-      "Liberte 6",
-      "Place Obe"
-    ]
-  },
-  {
-    id: 3,
-    numero: "15",
-    depart: "Pikine",
-    arrivee: "Medina",
-    arrets: 12,
-    listeArrets: [
-      "Pikine Centre",
-      "Thiaroye Gare",
-      "Hann",
-      "Colobane",
-      "Fass",
-      "Medina"
-    ]
-  },
-  {
-    id: 4,
-    numero: "23",
-    depart: "Ouakam",
-    arrivee: "Grand Dakar",
-    arrets: 10,
-    listeArrets: [
-      "Ouakam Village",
-      "Mermoz",
-      "Fann",
-      "Point E",
-      "Liberte 5",
-      "Grand Dakar"
-    ]
-  },
-  {
-    id: 5,
-    numero: "8",
-    depart: "Almadies",
-    arrivee: "Colobane",
-    arrets: 16,
-    listeArrets: [
-      "Almadies",
-      "Ngor",
-      "Yoff",
-      "Ouest Foire",
-      "Liberte 6",
-      "Colobane"
-    ]
-  },
-  {
-    id: 6,
-    numero: "12",
-    depart: "Yoff",
-    arrivee: "Sandaga",
-    arrets: 11,
-    listeArrets: [
-      "Yoff Village",
-      "Aeroport LSS",
-      "Parcelles U17",
-      "Grand Yoff",
-      "HLM",
-      "Sandaga"
-    ]
-  }
-];
+  // --- Fetch au démarrage ([] = une seule fois) ---
+  useEffect(() => {
+    fetch("http://localhost:5000/lignes")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Erreur serveur : " + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        setLignes(data);
+        setChargement(false);
+      })
+      .catch(error => {
+        setErreur(error.message);
+        setChargement(false);
+      });
+  }, []); // ← [] obligatoire !
 
   const lignesFiltrees = lignes.filter((l) =>
     l.depart.toLowerCase().includes(recherche.toLowerCase()) ||
@@ -125,25 +53,56 @@ function App() {
   }
 
   function handleRecherche(valeur) {
-  setRecherche(valeur);
-  setNbRecherches(nb => nb + 1);
-}
+    setRecherche(valeur);
+    setNbRecherches(nb => nb + 1);
+  }
 
+  // --- Écran 1 : Chargement ---
+  if (chargement) {
+    return (
+      <div className="App">
+        <Header />
+        <main className="contenu">
+          <p className="message-chargement">Chargement des lignes...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // --- Écran 2 : Erreur ---
+  if (erreur) {
+    return (
+      <div className="App">
+        <Header />
+        <main className="contenu">
+          <div className="message-erreur">
+            <p>Impossible de charger les lignes.</p>
+            <p className="erreur-detail">{erreur}</p>
+            <p>Vérifiez que le serveur Flask est lancé (python api/app.py).</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // --- Écran 3 : Succès ---
   return (
     <div className="App">
       <Header />
 
       <main className="contenu">
         <Recherche
-  valeur={recherche}
-  onChange={handleRecherche}
-/>
+          valeur={recherche}
+          onChange={handleRecherche}
+        />
 
-{nbRecherches > 0 && (
-  <p className="compteur-recherche">
-    Vous avez effectué {nbRecherches} recherche(s)
-  </p>
-)}
+        {nbRecherches > 0 && (
+          <p className="compteur-recherche">
+            Vous avez effectué {nbRecherches} recherche(s)
+          </p>
+        )}
 
         <p className="resultat-recherche">
           {lignesFiltrees.length} ligne
