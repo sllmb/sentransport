@@ -4,6 +4,7 @@ import Header from './Header';
 import Recherche from './Recherche';
 import LigneBus from './LigneBus';
 import DetailLigne from './DetailLigne';
+import Carte from "./Carte";
 import ListeLignes from './ListeLignes';
 import Footer from './Footer';
 import StatReseau from './StatReseau';
@@ -19,24 +20,31 @@ function App() {
   const [ligneSelectionnee, setLigneSelectionnee] = useState(null);
   const [nbRecherches, setNbRecherches] = useState(0);
 
-  // --- Fetch au démarrage ([] = une seule fois) ---
-  useEffect(() => {
-    fetch("http://localhost:5000/lignes")
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Erreur serveur : " + response.status);
-        }
-        return response.json();
-      })
-      .then(data => {
-        setLignes(data);
-        setChargement(false);
-      })
-      .catch(error => {
-        setErreur(error.message);
-        setChargement(false);
-      });
-  }, []); // ← [] obligatoire !
+ // Fonction séparée pour pouvoir la réutiliser
+function chargerLignes() {
+  setChargement(true);
+  setErreur(null);
+  fetch("http://localhost:5000/lignes")
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Erreur serveur : " + response.status);
+      }
+      return response.json();
+    })
+    .then(data => {
+      setLignes(data);
+      setChargement(false);
+    })
+    .catch(error => {
+      setErreur(error.message);
+      setChargement(false);
+    });
+}
+
+// useEffect appelle simplement la fonction
+useEffect(() => {
+  chargerLignes();
+}, []);
 
   const lignesFiltrees = lignes.filter((l) =>
     l.depart.toLowerCase().includes(recherche.toLowerCase()) ||
@@ -45,12 +53,31 @@ function App() {
   );
 
   function handleClickLigne(ligne) {
-    if (ligneSelectionnee && ligneSelectionnee.id === ligne.id) {
-      setLigneSelectionnee(null);
-    } else {
-      setLigneSelectionnee(ligne);
-    }
+  // Si on reclique sur la même ligne, on ferme le détail
+  if (ligneSelectionnee && ligneSelectionnee.id === ligne.id) {
+    setLigneSelectionnee(null);
+    return;
   }
+
+  // Sinon on fetch les détails depuis Flask
+  fetch(`http://localhost:5000/lignes/${ligne.id}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Erreur serveur : " + response.status);
+      }
+      return response.json();
+    })
+    .then(data => {
+      setLigneSelectionnee(data);
+    })
+    .catch(error => {
+      console.error("Erreur chargement détail :", error.message);
+    });
+}
+
+    <button className="btn-recharger" onClick={chargerLignes}>
+    Recharger
+  </button>
 
   function handleRecherche(valeur) {
     setRecherche(valeur);
@@ -131,6 +158,7 @@ function App() {
         {ligneSelectionnee && (
           <DetailLigne ligne={ligneSelectionnee} />
         )}
+        <Carte/>
       </main>
 
       <Footer />
