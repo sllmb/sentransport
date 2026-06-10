@@ -34,5 +34,17 @@
     "depart": "Yoff", "arrivee": "Sandaga",
     "arrets": 11,
     "listeArrets": ["Yoff Village","Aeroport LSS","Parcelles U17","Grand Yoff","HLM","Sandaga"]
+  },
+  {
+    "id": 7, "numero": "27",
+    "depart": "Rufisque", "arrivee": "Plateau",
+    "arrets": 15,
+    "listeArrets": ["Rufisque","Bargny","Thiaroye","Pikine","Colobane","Plateau"]
+  },
+  {
+    "id": 8, "numero": "DDD",
+    "depart": "Dakar", "arrivee": "Diamniadio",
+    "arrets": 8,
+    "listeArrets": ["Dakar","Hann","Rufisque","Bargny","Diamniadio"]
   }
 ]

@@ -9,6 +9,14 @@ CORS(app)
 with open("lignes_ddd.json", "r", encoding="utf-8") as f:
     lignes = json.load(f)
 
+with open("arrets.json", "r", encoding="utf-8") as f:
+    arrets = json.load(f)
+
+@app.route("/arrets")
+def get_arrets():
+    return jsonify(arrets)
+
+
 @app.route("/")
 def accueil():
     return jsonify({
@@ -29,15 +37,15 @@ def get_ligne(ligne_id):
 
 # --- EXERCICE 1 : GET /arrets ---
 
-@app.route("/arrets")
-def get_arrets():
-    tous_les_arrets = set()  # un set() ne garde pas les doublons
+# @app.route("/arrets")
+# def get_arrets():
+#     tous_les_arrets = set()  # un set() ne garde pas les doublons
 
-    for ligne in lignes:
-        for arret in ligne["listeArrets"]:
-            tous_les_arrets.add(arret)
+#     for ligne in lignes:
+#         for arret in ligne["listeArrets"]:
+#             tous_les_arrets.add(arret)
 
-    return jsonify(sorted(list(tous_les_arrets)))
+#     return jsonify(sorted(list(tous_les_arrets)))
 
 # --- EXERCICE 2 : GET /stats ---
 
