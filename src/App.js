@@ -8,6 +8,8 @@ import Carte from "./Carte";
 import ListeLignes from './ListeLignes';
 import Footer from './Footer';
 import StatReseau from './StatReseau';
+import Meteo from './Meteo';
+import SignalerIncident from './SignalerIncident';
 
 function App() {
   // --- Les 3 nouveaux états pour l'API ---
@@ -120,6 +122,8 @@ useEffect(() => {
       <Header />
 
       <main className="contenu">
+        <Meteo/>
+
         <Recherche
           valeur={recherche}
           onChange={handleRecherche}
@@ -159,6 +163,9 @@ useEffect(() => {
           <DetailLigne ligne={ligneSelectionnee} />
         )}
         <Carte/>
+
+        <SignalerIncident/>
+
       </main>
 
       <Footer />
